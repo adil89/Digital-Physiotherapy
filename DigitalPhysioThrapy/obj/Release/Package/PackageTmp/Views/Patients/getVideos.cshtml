@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "getVideos";
+ 
+}
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>YouTube Channel Listing</title>
+    <script type="text/javascript">
+
+        function getJSONData(yourUrl) {
+            var Httpreq = new XMLHttpRequest();
+            try {
+                Httpreq.open("GET", yourUrl, false);
+                Httpreq.send(null);
+            } catch (ex) {
+                alert(ex.message);
+            }
+            return Httpreq.responseText;
+        }
+
+        var apikey2 = "";
+        function clearScreen(playListId) {
+            
+            $('#videos').empty();
+
+            var videoinfo = JSON.parse(getJSONData("https://www.googleapis.com/youtube/v3/playlistItems?part=snippet%2CcontentDetails&maxResults=50&playlistId=" + playListId + "&key=" + apikey2));
+            var videos = videoinfo.items;
+            var videocount = videoinfo.pageInfo.totalResults;
+            // video listing
+            $('#videos').append( "<h1 style='text-align: center;'>Select a Video</h1><br\><br\>");
+            for (var i = 0; i < videos.length; i++) {
+                var videoid = videos[i].contentDetails.videoId;
+                var videotitle = videos[i].snippet.title;
+                var videodescription = videos[i].snippet.description;
+                var videodate = videos[i].snippet.publishedAt; // date time published
+                var videothumbnail = videos[i].snippet.thumbnails.default.url; // default, medium or high
+                $('#videos').append("<hr /><div style='width:100%;min-height:90px;'>"
+                    + "<a onclick=play_Video(" + "'" + videoid + "'" +") >"
+                    + "<img src='" + videothumbnail + "' style='border:none;float:left;margin-right:10px;' alt='" + videotitle + "' title='" + videotitle + "' /></a>"
+                    + "<h3><a onclick=play_Video(" + "'" + videoid + "'" + ")>" + videotitle + "</a></h3>" + videodescription + ""
+                    + "</div>");
+            }
+        }
+
+        var selectVid = '';
+        function play_Video(videoid) {
+            selectVid = videoid;
+            $('#btnSendVid').show();
+            $('#videoBody').empty();
+            $('#videoBody').append('<iframe id="video" width="420" height="315" src="//www.youtube.com/embed/' + videoid + '?rel=0" frameborder="0" allowfullscreen></iframe>');
+            $('#myModalVideo').modal('show');
+        }
+
+        
+
+        
+        function showVideoList(username, writediv, maxnumbervideos, apikey) {
+            try {
+                document.getElementById(writediv).innerHTML = "";
+                var keyinfo = JSON.parse(getJSONData("https://www.googleapis.com/youtube/v3/playlists?part=snippet&maxResults=50&channelId=UCIHHDXSBU8iVqWOwCIRguVA&key=" + apikey));
+
+                var userid = "";
+                var channeltitle = "";
+                var channeldescription = "";
+                var channelthumbnail = "";
+                apikey2 = apikey;
+
+                document.getElementById(writediv).innerHTML += "<h1 style='text-align: center;'>Select a Playlist</h1><br\><br\>";
+                for (var i = 0; i < keyinfo.items.length; i++)
+                {
+                    userid = keyinfo.items[i].id;
+                    channeltitle = keyinfo.items[i].snippet.title;
+                    channeldescription = keyinfo.items[i].snippet.description;
+                    channelthumbnail = keyinfo.items[i].snippet.thumbnails.default.url; // default, medium or high
+                    //channel header
+                    document.getElementById(writediv).innerHTML += "<div style='width:100%;min-height:90px;'>"
+                        + "<a onclick=clearScreen(" + "'" + keyinfo.items[0].id + "'" + ")>"
+                        + "<img src='" + channelthumbnail + "' style='border:none;float:left;margin-right:10px;' alt='" + channeltitle + "' title='" + channeltitle + "' /></a>"
+                        + "<div style='width:100%;text-align:center;'><h1><a onclick=clearScreen("+ "'" + keyinfo.items[i].id + "'" + ")>" + channeltitle +
+                        "</a></h1> </div>"
+                        + "</div>";
+                }
+
+                
+            } catch (ex) {
+                alert(ex.message);
+            }
+        }
+
+        $('#btnSendVid').click(function () {
+
+            var ai = {
+                id: patId,
+                videoId: selectVid
+            };
+
+            if (cnt == 0)
+            {
+                $.ajax({
+                    url: '/Patients/SendVideo',
+                    type: 'POST',
+                    data: JSON.stringify(ai),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        alert("Video Sent");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+                cnt = cnt + 1;
+            }
+            
+
+        });
+
+    </script>
+</head>
+<body>
+    <div id="videos"></div>
+
+
+    <script type="text/javascript">
+        showVideoList("adil.ilyas89@gmail.com", "videos", 25, "AIzaSyDb2c9RTdyWhjQwiLlzq8h6kYb6T7IUHuc");
+    </script>
+
+</body>
+</html>

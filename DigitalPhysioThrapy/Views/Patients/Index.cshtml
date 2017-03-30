@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@section MyOtherJavascript {
+
+<script>
+    $(document).ready(function () {
+
+        $('#btnClose').click(function () {
+            $('#myModalVideo').modal('hide');
+            $('#videoBody').empty();
+        });
+
+            $("#tbl_Patients").DataTable({
+
+                "ajax": {
+                    "url": "/Patients/LoadData",
+                          "type": "GET",
+                          "datatype": "json"
+                        },
+                "columns": [
+                         { "data": "Name", "autoWidth": true },
+                         { "data": "t_Name", "autoWidth": true },
+                         { "data": "p_Completed", "autoWidth": true },
+                         { "data": null, "autoWidth": true },
+                         { "data": null, "autoWidth": true }
+                ],
+
+
+                "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+
+                    $('td:eq(3)', nRow).html('<button type="button" id="btnMessage" onclick="btnClickSendMessage(' + aData.id + ')" class="btn btn-success">Send Message</button>');
+                    $('td:eq(4)', nRow).html('<button type="button" id="btnMessage" onclick="btnClickSendVideo(' + aData.id + ')" class="btn btn-warning">Send Video</button>');
+                }
+
+
+            });
+
+            
+
+            $('#btnSendMsg').click(function () {
+                
+                var msg = $('#message').val();
+
+                var ai = {
+                    id: patientId,
+                    message: msg
+                };
+
+                $.ajax({
+                    url: '/Patients/SendMessage',
+                    type: 'POST',
+                    data: JSON.stringify(ai),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        alert("Message Sent");
+                    },
+                        error: function () {
+                            alert("error");
+                        }
+                    });
+                });
+            
+            
+
+        });
+
+        var patientId = 0;
+        function btnClickSendMessage(id) {
+            $('#message').val("");
+            $('#myModal').modal('show');
+            patientId = id;
+        }
+        
+        var patId = '';
+        var cnt = 0
+        function btnClickSendVideo(id) {
+            cnt = 0;
+            patId = id;
+            $('#btnSendVid').hide();
+            $('#videoBody').load("@Url.Action("getVideos","Patients")");
+            $('#myModalVideo').modal('show');
+            
+        }
+    
+</script>
+
+   
+}
+
+
+
+
+<body>
+
+    <h2 style="text-align: left" >View Patients</h2>
+
+
+
+<table id="tbl_Patients" class="display">
+        
+    <thead>
+    <tr>
+        <th>Patient Name</th>
+        <th>Trainer Name</th>
+        <th>Percent Completed</th>
+        <th>Message</th>
+        <th>Video</th>
+    </tr>
+    </thead>
+        
+</table>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content" style="margin-top: 30%">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Send Message</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+             <label for="comment">Message:</label>
+             <textarea class="form-control"  rows="5" id="message">
+             </textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="btnSendMsg" class="btn btn-primary" data-dismiss="modal">Send</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+    <div class="modal fade" id="myModalVideo" >
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content" style="margin-top: 10%;width: 197%;margin-left: -50%;">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Send Video</h4>
+        </div>
+        <div id="videoBody" style="overflow: auto;height:450px;" class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" id="btnSendVid" class="btn btn-primary" data-dismiss="modal">Send</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+    
+</body>
+
+
+
+
+
+
+

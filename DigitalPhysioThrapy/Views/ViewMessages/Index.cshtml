@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chat</title>
+    <link href="~/Content/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/css/single.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript">
+
+    
+        function getJSONData(yourUrl) {
+            var Httpreq = new XMLHttpRequest();
+            try {
+                Httpreq.open("GET", yourUrl, false);
+                Httpreq.send(null);
+            } catch (ex) {
+                alert(ex.message);
+            }
+            return Httpreq.responseText;
+        }
+
+        $(document).ready(function() {
+
+            $('#btnClose').click(function(){
+                $('#videoBody').empty();
+            });
+
+            var ai = {
+                id: @ViewBag.PatientId
+            };
+
+            $.ajax({
+                url: '/ViewMessages/GetMessages',
+                type: 'POST',
+                data: JSON.stringify(ai),
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    
+                    for(var j = 0;j < data.rec.length;j++)
+                    {
+
+                       
+                        if(data.rec[j].IsVideo == false)
+                        {
+                            $("ul").append("<li class='left clearfix'><span class='chat-img pull-left'>" +
+                                           "<img src='http://placehold.it/50/55C1E7/fff&text=T' alt='User Avatar' class='img-circle' />" +
+                                           "</span>" +
+                                           "<div class='chat-body clearfix'>" +
+                                           "<div class='header'>" +
+                                           "<strong class='primary-font'>Trainer</strong> <small class='pull-right text-muted'>"+
+                                           "<span class='glyphicon glyphicon-time'></span>12 mins ago</small>"+
+                                           "</div>" +
+                                           "<p> "+ data.rec[j].message + "</p>"+
+                                           "</div>" +
+                                           "</li>");
+                        }else{
+                            
+                            var videoinfo = JSON.parse(getJSONData("https://www.googleapis.com/youtube/v3/videos?part=id%2C+snippet&id=" + data.rec[j].message + "&key=AIzaSyDb2c9RTdyWhjQwiLlzq8h6kYb6T7IUHuc"));
+                            var videos = videoinfo.items;
+                            var videocount = videoinfo.pageInfo.totalResults;
+                            // video listing
+                            //for (var i = 0; i < videos.length; i++) {
+                                var videoid = videos[0].id;
+                                var videotitle = videos[0].snippet.title;
+                                var videodescription = videos[0].snippet.description;
+                                var videodate = videos[0].snippet.publishedAt; // date time published
+                                var videothumbnail = videos[0].snippet.thumbnails.default.url; // default, medium or high
+                                $("ul").append("<hr /><div style='width:100%;min-height:90px;'>"
+                                    + "<a onclick=play_Video(" + "'" + videoid + "'" +") >"
+                                    + "<img src='" + videothumbnail + "' style='border:none;float:left;margin-right:10px;' alt='" + videotitle + "' title='" + videotitle + "' /></a>"
+                                    + "<h3><a onclick=play_Video(" + "'" + videoid + "'" + ")>" + videotitle + "</a></h3>" + videodescription + ""
+                                    + "</div>");
+                            //}
+                        }
+                        
+                            
+                    }
+                    
+                    //alert(data.rec[0].message);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+
+
+        });
+
+        function play_Video(videoId){
+            $('#videoBody').empty();
+            $('#videoBody').append('<iframe id="video" width="1150" height="400" src="//www.youtube.com/embed/' + videoId + '?rel=0" frameborder="0" allowfullscreen></iframe>');
+            $('#myModalVideo').modal('show');
+        }
+        
+    </script>
+    
+</head>
+<body>
+
+    <h2>@ViewBag.pName  Messages</h2>
+
+    <div  class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="panel panel-primary" style="width: 251%;">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-comment"></span> Messages
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                     
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul class="chat">
+
+                          @* <li class="right clearfix"><span class="chat-img pull-right">
+                            <img src="http://placehold.it/50/FA6F57/fff&text=ME" alt="User Avatar" class="img-circle" />
+                        </span>
+                            <div class="chat-body clearfix">
+                                <div class="header">
+                                    <small class=" text-muted"><span class="glyphicon glyphicon-time"></span>13 mins ago</small>
+                                    <strong class="pull-right primary-font">Bhaumik Patel</strong>
+                                </div>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare
+                                    dolor, quis ullamcorper ligula sodales.
+                                </p>
+                            </div>
+                        </li>*@
+                        
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btn-chat">
+                                Send</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModalVideo" >
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content" style="margin-top: 10%;width: 197%;margin-left: -50%;">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Play Video</h4>
+        </div>
+        <div id="videoBody" style="overflow: auto;height:450px;" class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
+            
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+
+</body>
+</html>
+
+

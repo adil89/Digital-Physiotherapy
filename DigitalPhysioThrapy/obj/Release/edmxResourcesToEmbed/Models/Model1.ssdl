@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="dTharapyDBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="dTharapyDBModelStoreContainer">
+    <EntitySet Name="tbl_Messages" EntityType="dTharapyDBModel.Store.tbl_Messages" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="tbl_Patients" EntityType="dTharapyDBModel.Store.tbl_Patients" store:Type="Tables" Schema="dbo" />
+  </EntityContainer>
+  <EntityType Name="tbl_Messages">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="message" Type="varchar" MaxLength="1000" />
+    <Property Name="PatientsIDFK" Type="int" />
+    <Property Name="IsVideo" Type="bit" />
+  </EntityType>
+  <EntityType Name="tbl_Patients">
+    <Key>
+      <PropertyRef Name="id" />
+    </Key>
+    <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="t_Name" Type="varchar" MaxLength="50" />
+    <Property Name="p_Completed" Type="varchar" MaxLength="50" />
+  </EntityType>
+</Schema>

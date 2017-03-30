@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "addPatients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    ViewBag.Title = "Add Patient";
+}
+
+@section MyOtherJavascript {
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#btnSave').click(function () {
+
+              
+                var name = $('#txtPname').val();
+                var t_name = $('#txtTname').val();
+                var UserName = $('#txtUserName').val();
+                var password = $('#txtPassword').val();
+
+                var ai = {
+                    name: name,
+                    t_name: t_name,
+                    user_name: UserName,
+                    password: password
+                };
+
+                $.ajax({
+                    url: '/Patients/SavePatient',
+                    type: 'POST',
+                    data: JSON.stringify(ai),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        alert("Patient Saved");
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            });
+
+
+
+        });
+    </script>
+    
+    
+}
+
+<h2>Add Patients</h2>
+<body>
+<form>
+  <div style="width: 20%" class="form-group">
+    <label for="inputdefault">Patient Name</label>
+    <input class="form-control" id="txtPname" type="text">
+  </div>
+  <div style="width: 20%" class="form-group">
+    <label for="inputlg">Trainer Name</label>
+    <input class="form-control input-lg" id="txtTname" type="text">
+  </div>
+  <div style="width: 20%" class="form-group">
+    <label for="inputlg">User Name</label>
+    <input class="form-control input-lg" id="txtUserName" type="text">
+  </div>
+  <div style="width: 20%" class="form-group">
+    <label for="inputlg">Password</label>
+    <input class="form-control input-lg" id="txtPassword" type="text">
+  </div>
+  <button style="margin-left:14%" class="btn btn-success" id="btnSave">Save</button>
+</form>
+
+</body>
